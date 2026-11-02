@@ -1,88 +1,73 @@
-// Copyright 2021 JUSTINO RAMOS STUDENT
-
 /**
- * (TRABAJO PRACTICO)
- *
- * @author juscoder
+ * Registro de notas de la Secretaría.
+ * Valida tres notas (0 a 20), calcula el promedio y lo agrega a la tabla.
+ * Aprueba con promedio mayor o igual a 12.5 (redondeo vigesimal: 13).
  */
-function agregarNotas(){
-  
-    let nom=document.getElementById('nombre').value;
-    let not1=document.getElementById('nota1').value;
-    let not2=document.getElementById('nota2').value;
-    let not3=document.getElementById('nota3').value;
-    
-    //Validadr el campo nombre
-    if(nom===""){
-        
-        swal("Ingrese el nombre del Estudiante", "El campo de nombre no puede ser vacio", "warning");return false;
-    }
-    // Validar las notas si estan vacias
-    if(not1==="" || not2==="" || not3===""){
-        
-        swal("Ingese las notas por favor", "La notas no pueden ser vacios", "warning");return false;
-        
-    }
-    //Validar las notas, no mayor de 21 puntos, solo asta 20
-    if(not1 >= 21 || not2 >= 21  || not3 >= 21){
-        alert("la nota no puede ser mas de 20")
+const NOTA_MIN = 0;
+const NOTA_MAX = 20;
+const NOTA_APROBATORIA = 12.5;
+
+function celda(texto) {
+    const td = document.createElement('td');
+    td.textContent = texto; // textContent evita inyectar HTML desde el formulario
+    return td;
+}
+
+function leerNota(id) {
+    const valor = document.getElementById(id).value.trim();
+    if (valor === '') return { vacia: true };
+    const numero = Number(valor);
+    return { vacia: false, numero, valida: Number.isFinite(numero) && numero >= NOTA_MIN && numero <= NOTA_MAX };
+}
+
+function agregarNotas() {
+    const inputNombre = document.getElementById('nombre');
+    const nombre = inputNombre.value.trim();
+
+    if (nombre === '') {
+        swal('Ingrese el nombre del estudiante', 'El campo de nombre no puede estar vacío.', 'warning');
+        inputNombre.focus();
         return false;
     }
-    
-    //Promediar la suma de las notas entre 3
-    var prom = (parseFloat(not1)+ parseFloat(not2)+ parseFloat(not3)) /3;  
 
-    //Variable obserbacion
-    var  obs =0;
-    //Promedio menor o igual a 12.5 entonces aprobado, caso ocntrario aprobado
-    if(prom >=12.5){
-        obs =value="!Aprobado¡ &#x2714";
-        
-    }else{
-    obs =value="!Desaprobado¡ &#x274c";
-    
-    }   
-      
-    const tabla=document.getElementById('addtabla');
-    
-    const fila=document.createElement('tr');            
-              
-    
-    fila.innerHTML=`<td> ${nom} </td><td> ${not1} </td><td> ${not2} </td><td> ${not3} </td><td> ${prom.toFixed(1)} </td><td> ${obs} </td>`;
-    
-     
+    const ids = ['nota1', 'nota2', 'nota3'];
+    const notas = ids.map(leerNota);
 
-
-    
-    tabla.appendChild(fila);
-
-    if(prom>12.5){
-        document.querySelector("#addtabla tr:last-child td:nth-child(5)").style.background = "#B3DEBA";
-    }else{
-        document.querySelector("#addtabla tr:last-child td:nth-child(5)").style.background = "#FFCABA";
+    if (notas.some(n => n.vacia)) {
+        swal('Ingrese las tres notas', 'Ninguna nota puede quedar vacía.', 'warning');
+        document.getElementById(ids[notas.findIndex(n => n.vacia)]).focus();
+        return false;
     }
-    if(not1>12.5){
-        document.querySelector("#addtabla tr:last-child td:nth-child(2)").style.color = "red";
-    }else{
-        document.querySelector("#addtabla tr:last-child td:nth-child(2)").style.color = "red";
+    if (notas.some(n => !n.valida)) {
+        swal('Nota fuera de rango', `Cada nota debe estar entre ${NOTA_MIN} y ${NOTA_MAX}.`, 'error');
+        document.getElementById(ids[notas.findIndex(n => !n.valida)]).focus();
+        return false;
     }
-    if(not2>12.5){
-        document.querySelector("#addtabla tr:last-child td:nth-child(3)").style.color = "red";
-    }else{
-        document.querySelector("#addtabla tr:last-child td:nth-child(3)").style.color = "red";
-    }
-    if(not3>12.5){
-        document.querySelector("#addtabla tr:last-child td:nth-child(4)").style.color = "red";
-    }else{
-        document.querySelector("#addtabla tr:last-child td:nth-child(4)").style.color = "red";
-    }
-    
-    
-    
-    document.getElementById('nombre').value='';
-    document.getElementById('nota1').value='';
-    document.getElementById('nota2').value='';
-    document.getElementById('nota3').value='';
-    
 
+    const valores = notas.map(n => n.numero);
+    const promedio = valores.reduce((a, b) => a + b, 0) / valores.length;
+    const aprobado = promedio >= NOTA_APROBATORIA;
+
+    const fila = document.createElement('tr');
+    fila.appendChild(celda(nombre));
+    valores.forEach(v => {
+        const td = celda(v);
+        td.style.color = v >= NOTA_APROBATORIA ? '#1d4ed8' : '#dc2626';
+        fila.appendChild(td);
+    });
+
+    const tdPromedio = celda(promedio.toFixed(1));
+    tdPromedio.style.background = aprobado ? '#B3DEBA' : '#FFCABA';
+    tdPromedio.style.fontWeight = '600';
+    fila.appendChild(tdPromedio);
+    fila.appendChild(celda(aprobado ? '¡Aprobado! ✔' : '¡Desaprobado! ❌'));
+
+    document.getElementById('addtabla').appendChild(fila);
+
+    swal('Nota registrada', `${nombre}: promedio ${promedio.toFixed(1)}`, aprobado ? 'success' : 'info');
+
+    inputNombre.value = '';
+    ids.forEach(id => { document.getElementById(id).value = ''; });
+    inputNombre.focus();
+    return true;
 }
