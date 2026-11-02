@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Secretaría: calculadora y registro de promedios de la I.E. Alfred Nobel.">
+    <link rel="icon" type="image/png" href="assets/img/logo2.png">
     <title>Institución Educativa Alfred Nobel | Secretaría y Notas</title>
     <!-- Modern Fonts -->
     <link
@@ -519,7 +521,7 @@
         <ul class="nav-links" id="nav-links">
             <li><a href="index.html">Inicio</a></li>
             <li><a href="institucion.html">Institución</a></li>
-            <li><a href="registro de notas2.html" class="active">Secretaría</a></li>
+            <li><a href="notas.html" class="active">Secretaría</a></li>
             <li><a href="contactenos.html">Contáctenos</a></li>
             <li><a href="galeria.html">Galería</a></li>
         </ul>
@@ -527,7 +529,7 @@
 
     <!-- Page Header -->
     <header class="page-header">
-        <h1>Sistema Matricial y de Calificaciones</h1>
+        <h1>Sistema de Matrícula y Calificaciones</h1>
         <p>Gestión eficiente del rendimiento académico de nuestros estudiantes. Calcule promedios y genere reportes
             detallados en tiempo real.</p>
     </header>
@@ -604,7 +606,6 @@
                     <i class="fa-solid fa-circle-info"></i> Al hacer clic en el botón se promediarán las notas y se
                     agregarán al registro.
                 </p>
-                <!-- Because the previous JS logic handles form submission natively we use button onclick -->
                 <button class="btn-action" onclick="agregarNotas();">
                     <i class="fa-solid fa-calculator"></i> Promediar y Guardar Nota
                 </button>
@@ -693,36 +694,7 @@
             }
         });
 
-        // Demo Function fallback if original JS logic is missing
-        if (typeof agregarNotas !== 'function') {
-            window.agregarNotas = function () {
-                event.preventDefault();
-                const nombre = document.getElementById('nombre').value;
-                const n1 = parseFloat(document.getElementById('nota1').value);
-                const n2 = parseFloat(document.getElementById('nota2').value);
-                const n3 = parseFloat(document.getElementById('nota3').value);
 
-                if (!nombre || isNaN(n1) || isNaN(n2) || isNaN(n3)) {
-                    swal("Error", "Por favor complete todos los campos", "error");
-                    return;
-                }
-
-                const prom = ((n1 + n2 + n3) / 3).toFixed(2);
-                const obs = prom >= 11 ? '<span class="status-badge aprobado">Aprobado</span>' : '<span class="status-badge desaprobado">Desaprobado</span>';
-
-                const tbody = document.getElementById('addtabla');
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${nombre}</td><td>${n1}</td><td>${n2}</td><td>${n3}</td><td><strong>${prom}</strong></td><td>${obs}</td>`;
-                tbody.appendChild(tr);
-
-                // Reset form
-                document.getElementById('nombre').value = '';
-                document.getElementById('nota1').value = '';
-                document.getElementById('nota2').value = '';
-                document.getElementById('nota3').value = '';
-                swal("Éxito", "Promedio calculado correctamente", "success");
-            }
-        }
     </script>
 </body>
 
